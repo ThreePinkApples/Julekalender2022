@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace AdventCalendar2022.AdventOfCode;
+﻿namespace AdventCalendar2022.AdventOfCode;
 internal class Day8
 {
     internal record Point(int X, int Y);
