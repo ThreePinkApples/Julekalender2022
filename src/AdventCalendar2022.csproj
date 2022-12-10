@@ -12,22 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="AdventOfCode\Data\Day1Input.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="AdventOfCode\Data\Day2Input.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="AdventOfCode\Data\Day3Input.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="AdventOfCode\Data\Day4Input.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="AdventOfCode\Data\Day5Input.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="AdventOfCode\Data\Day6Input.txt">
+    <None Update="AdventOfCode\Data\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
