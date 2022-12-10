@@ -8,7 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="AdventOfCode\" />
+    <Folder Include="AdventOfCode\Data\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="AdventOfCode\Data\Day1Input.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
