@@ -28,26 +28,28 @@ internal class Day9
             new("L", 25 ),
             new("U", 20 )
         };
+        var startX = 10000;
+        var startY = 10000;
         var knots = new Point[]
         {
-            new Point { X = 0, Y = 0 },
-            new Point { X = 0, Y = 0 },
-            new Point { X = 0, Y = 0 },
-            new Point { X = 0, Y = 0 },
-            new Point { X = 0, Y = 0 },
-            new Point { X = 0, Y = 0 },
-            new Point { X = 0, Y = 0 },
-            new Point { X = 0, Y = 0 },
-            new Point { X = 0, Y = 0 },
-            new Point { X = 0, Y = 0 }
+            new Point { X = startX, Y = startY },
+            new Point { X = startX, Y = startY },
+            new Point { X = startX, Y = startY },
+            new Point { X = startX, Y = startY },
+            new Point { X = startX, Y = startY },
+            new Point { X = startX, Y = startY },
+            new Point { X = startX, Y = startY },
+            new Point { X = startX, Y = startY },
+            new Point { X = startX, Y = startY },
+            new Point { X = startX, Y = startY }
         };
         var visitedPart1 = new HashSet<Point>()
         {
-            new Point { X = 0, Y = 0 }
+            new Point { X = startX, Y = startY }
         };
         var visitedPart2 = new HashSet<Point>()
         {
-            new Point { X = 0, Y = 0 }
+            new Point { X = startX, Y = startY }
         };
         foreach (var move in moves)
         {
@@ -56,16 +58,16 @@ internal class Day9
                 switch (move.Item1)
                 {
                     case "U":
-                        MoveUp(knots);
+                        knots[0].Y += 1;
                         break;
                     case "D":
-                        MoveDown(knots);
+                        knots[0].Y -= 1;
                         break;
                     case "R":
-                        MoveRight(knots);
+                        knots[0].X += 1;
                         break;
                     case "L":
-                        MoveLeft(knots);
+                        knots[0].X -= 1;
                         break;
                 }
                 Follow(knots);
@@ -74,32 +76,7 @@ internal class Day9
             }
         }
         Console.WriteLine($"AdventOfCode Day 9 Part 1 result: {visitedPart1.Count()}");
-        // Cheated a bit on Part 2. I re-ran my logic from Part 1 and got the wrong result and was unable to understand why it would be wrong given that the task description said
-        // "Each knot further down the rope follows the knot in front of it using the same rules as before.".
-        // But then I Google the solution/discussions and see that the movement does change to also being diagonal? I found no explanation for why this is though.
-        // The task description tries to hint at this with "However, be careful: more types of motion are possible than before, so you might want to visually compare your simulated rope to the one above."
-        // and I could see in the examples that they did move diagonally, but I was unable to understand the reason behind this.
         Console.WriteLine($"AdventOfCode Day 9 Part 2 result: {visitedPart2.Count()}");
-    }
-
-    private static void MoveUp(Point[] knots)
-    {
-        knots[0].Y += 1;
-    }
-
-    private static void MoveDown(Point[] knots)
-    {
-        knots[0].Y -= 1;
-    }
-
-    private static void MoveRight(Point[] knots)
-    {
-        knots[0].X += 1;
-    }
-
-    private static void MoveLeft(Point[] knots)
-    {
-        knots[0].X -= 1;
     }
 
     private static void Follow(Point[] knots)
@@ -108,21 +85,26 @@ internal class Day9
         {
             var diff = new Point
             {
-                X = Math.Abs(knots[knotIndex - 1].X - knots[knotIndex].X),
-                Y = Math.Abs(knots[knotIndex - 1].Y - knots[knotIndex].Y)
+                X = knots[knotIndex - 1].X - knots[knotIndex].X,
+                Y = knots[knotIndex - 1].Y - knots[knotIndex].Y
             };
-            if (diff.Y >= 2)
+            if (Math.Abs(diff.Y) == 2)
             {
-                knots[knotIndex].Y += (knots[knotIndex - 1].Y - knots[knotIndex].Y) / 2;
-                if (diff.X >= 2)
-                    knots[knotIndex].X += (knots[knotIndex - 1].X - knots[knotIndex].X) / 2;
+                // Previous knot moved UP or DOWN
+                knots[knotIndex].Y += diff.Y / 2;
+                if (Math.Abs(diff.X) == 2)
+                    // Incase knot also moved RIGHT or LEFT
+                    knots[knotIndex].X += diff.X / 2;
                 else
-                    knots[knotIndex].X += knots[knotIndex - 1].X - knots[knotIndex].X;
+                    // Allign on X-axis
+                    knots[knotIndex].X += diff.X;
             }
-            else if (diff.X >= 2)
+            else if (Math.Abs(diff.X) == 2)
             {
-                knots[knotIndex].X += (knots[knotIndex - 1].X - knots[knotIndex].X) / 2;
-                knots[knotIndex].Y += knots[knotIndex - 1].Y - knots[knotIndex].Y;
+                // Previous knot moved RIGHT or LEFT
+                knots[knotIndex].X += diff.X / 2;
+                // Allign on Y-axis
+                knots[knotIndex].Y += diff.Y;
             }
         }
     }
