@@ -1,14 +1,10 @@
-﻿using System.Drawing;
-
-namespace AdventCalendar2022.AdventOfCode;
+﻿namespace AdventCalendar2022.AdventOfCode;
 internal class Day9
 {
     internal record class Point
     {
         public int X { get; set; }
         public int Y { get; set; }
-
-
     }
 
     public static void Run()
