@@ -4,10 +4,11 @@ internal class Day13
     public static void Run()
     {
         var packetPairStrings = File.ReadAllText("AdventOfCode/Data/Day13Input.txt")
-            .Split("\n\n");
+            .Split("\n\n")
+            .Where(line => !string.IsNullOrWhiteSpace(line));
         foreach (var packetPairString in packetPairStrings)
         {
-            ComparePair(packetPairString);
+            ComparePair(packetPairString.Trim());
         }
         //Console.WriteLine($"AdventOfCode Day 13 Part 1 result: {signalStrengthSum}");
         //Console.WriteLine($"AdventOfCode Day 13 Part 2 result:");
