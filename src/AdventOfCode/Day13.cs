@@ -56,7 +56,6 @@ internal class Day13
         packets.AddRange(dividerPackets);
         var sortedPackets = packets.OrderBy(p => p, comparer).ToList();
         Console.WriteLine($"AdventOfCode Day 13 Part 1 result: {indexesInRightOrder.Sum()}");
-        Console.WriteLine($"{string.Join("\n", sortedPackets)}");
         var decoderKey = (sortedPackets.IndexOf(dividerPackets[0]) + 1) * (sortedPackets.IndexOf(dividerPackets[1]) + 1);
         Console.WriteLine($"AdventOfCode Day 13 Part 2 result: {decoderKey}");
     }
@@ -64,11 +63,12 @@ internal class Day13
 
 public class PacketComparer : IComparer<Packet>
 {
+    public static bool Debug = false;
     public int Compare(Packet left, Packet right)
     {
         if (left == right) return 0;
         var result = ComparePair(left, right);
-        Console.WriteLine(result);
+        WriteLine(result);
         return result.Value ? -1 : 1;
     }
 
@@ -76,25 +76,25 @@ public class PacketComparer : IComparer<Packet>
     {
         var largestPacket = left.Children.Count < right.Children.Count ? right.Children.Count : left.Children.Count;
         if (indent == "")
-            Console.WriteLine($"{indent}- Compare {left} vs {right}");
+            WriteLine($"{indent}- Compare {left} vs {right}");
         indent += "  ";
         for (var childIndex = 0; childIndex < largestPacket; childIndex++)
         {
             if (childIndex == left.Children.Count)
             {
                 // Left has run out of items, in the right order
-                Console.WriteLine($"{indent}- Left side ran out of items");
+                WriteLine($"{indent}- Left side ran out of items");
                 return true;
             }
             else if (childIndex == right.Children.Count)
             {
                 // Right has run out of items, not in the right order
-                Console.WriteLine($"{indent}- Right side ran out of items");
+                WriteLine($"{indent}- Right side ran out of items");
                 return false;
             }
             var childLeft = left.Children[childIndex];
             var childRight = right.Children[childIndex];
-            Console.WriteLine($"{indent}- Compare {childLeft} vs {childRight}");
+            WriteLine($"{indent}- Compare {childLeft} vs {childRight}");
             if (childLeft.IsItem && childRight.IsItem)
             {
                 if (childLeft.Item == null && childRight.Item == null)
@@ -113,17 +113,23 @@ public class PacketComparer : IComparer<Packet>
             if (childLeft.IsItem)
             {
                 childLeft = new Packet(childLeft);
-                Console.WriteLine($"{indent}  - Mixed types; convert left side to {childLeft} and retry comparison");
+                WriteLine($"{indent}  - Mixed types; convert left side to {childLeft} and retry comparison");
             }
             else if (childRight.IsItem)
             {
                 childRight = new Packet(childRight);
-                Console.WriteLine($"{indent}  - Mixed types; convert right side to {childRight} and retry comparison");
+                WriteLine($"{indent}  - Mixed types; convert right side to {childRight} and retry comparison");
             }
             var childCompare = ComparePair(childLeft, childRight, indent + "  ");
             if (childCompare != null) return childCompare;
         }
         return null;
+    }
+
+    private static void WriteLine(object? line)
+    {
+        if (Debug)
+            Console.WriteLine(line);
     }
 }
 
