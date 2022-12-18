@@ -30,28 +30,31 @@ internal class Day13
         var packetPairStrings = File.ReadAllText("AdventOfCode/Data/Day13Input.txt")
             .Split("\n\n")
             .Where(line => !string.IsNullOrWhiteSpace(line))
+            .Select(line => line.Trim().Split("\n").Select(ps => Packet.FromPacketString(ps.Trim()).Item1))
+            .SelectMany(p => p)
             .ToArray();
-        //var packetPairStrings = sample
+        //packetPairStrings = sample
         //    .Split("\r\n\r\n")
         //    .Where(line => !string.IsNullOrWhiteSpace(line))
+        //    .Select(line => line.Trim().Split("\n").Select(ps => Packet.FromPacketString(ps.Trim()).Item1))
+        //    .SelectMany(p => p)
         //    .ToArray();
         var indexesInRightOrder = new List<int>();
-        for (var index = 0; index < packetPairStrings.Length; index++)
+        var index = 0;
+        foreach (var packetPair in packetPairStrings.Chunk(2))
         {
-            if (ComparePair(packetPairStrings[index].Trim()))
-            {
-                indexesInRightOrder.Add(index + 1);
-            }
+            index++;
+            if (ComparePair(packetPair))
+                indexesInRightOrder.Add(index);
         }
         Console.WriteLine($"AdventOfCode Day 13 Part 1 result: {indexesInRightOrder.Sum()}");
         //Console.WriteLine($"AdventOfCode Day 13 Part 2 result:");
     }
 
-    private static bool ComparePair(string packetPairString)
+    private static bool ComparePair(Packet[] packetPair)
     {
-        var packets = packetPairString.Split("\n").Select(ps => Packet.FromPacketString(ps.Trim()).Item1).ToList();
-        var leftPacket = packets.First();
-        var rightPacket = packets.Last();
+        var leftPacket = packetPair.First();
+        var rightPacket = packetPair.Last();
         var result = ComparePair(leftPacket, rightPacket);
         Console.WriteLine(result);
         return result.Value;
