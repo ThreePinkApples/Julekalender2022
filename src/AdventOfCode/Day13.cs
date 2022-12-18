@@ -52,36 +52,34 @@ internal class Day13
         var packets = packetPairString.Split("\n").Select(ps => Packet.FromPacketString(ps.Trim()).Item1).ToList();
         var leftPacket = packets.First();
         var rightPacket = packets.Last();
-        Console.WriteLine(leftPacket);
-        Console.WriteLine(rightPacket);
         var result = ComparePair(leftPacket, rightPacket);
         Console.WriteLine(result);
         return result.Value;
     }
 
-    private static bool? ComparePair(Packet left, Packet right)
+    private static bool? ComparePair(Packet left, Packet right, string indent = "")
     {
         var largestPacket = left.Children.Count < right.Children.Count ? right.Children.Count : left.Children.Count;
+        if (indent == "")
+            Console.WriteLine($"{indent}- Compare {left} vs {right}");
+        indent += "  ";
         for (var childIndex = 0; childIndex < largestPacket; childIndex++)
         {
             if (childIndex == left.Children.Count)
+            {
                 // Left has run out of items, in the right order
+                Console.WriteLine($"{indent}- Left side ran out of items");
                 return true;
+            }
             else if (childIndex == right.Children.Count)
+            {
                 // Right has run out of items, not in the right order
+                Console.WriteLine($"{indent}- Right side ran out of items");
                 return false;
+            }
             var childLeft = left.Children[childIndex];
             var childRight = right.Children[childIndex];
-            if (childLeft.IsItem)
-            {
-                while (!childRight.IsItem && childRight.Children.Count > 0)
-                    childRight = childRight.Children.First();
-            }
-            else if (childRight.IsItem)
-            {
-                while (!childLeft.IsItem && childLeft.Children.Count > 0)
-                    childLeft = childLeft.Children.First();
-            }
+            Console.WriteLine($"{indent}- Compare {childLeft} vs {childRight}");
             if (childLeft.IsItem && childRight.IsItem)
             {
                 if (childLeft.Item == null && childRight.Item == null)
@@ -97,7 +95,17 @@ internal class Day13
                     return childLeft.Item < childRight.Item;
                 continue;
             }
-            var childCompare = ComparePair(childLeft, childRight);
+            if (childLeft.IsItem)
+            {
+                childLeft = new Packet(childLeft);
+                Console.WriteLine($"{indent}  - Mixed types; convert left side to {childLeft} and retry comparison");
+            }
+            else if (childRight.IsItem)
+            {
+                childRight = new Packet(childRight);
+                Console.WriteLine($"{indent}  - Mixed types; convert right side to {childRight} and retry comparison");
+            }
+            var childCompare = ComparePair(childLeft, childRight, indent + "  ");
             if (childCompare != null) return childCompare;
         }
         return null;
@@ -111,6 +119,11 @@ public class Packet
     public List<Packet> Children = new List<Packet>();
 
     public Packet() { }
+
+    public Packet(Packet child)
+    {
+        Children.Add(child);
+    }
 
     public Packet(int? item)
     {
