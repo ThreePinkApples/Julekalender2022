@@ -27,37 +27,49 @@ internal class Day13
 [1,[2,[3,[4,[5,6,7]]]],8,9]
 [1,[2,[3,[4,[5,6,0]]]],8,9]
 ";
-        var packetPairStrings = File.ReadAllText("AdventOfCode/Data/Day13Input.txt")
+        var packets = File.ReadAllText("AdventOfCode/Data/Day13Input.txt")
             .Split("\n\n")
             .Where(line => !string.IsNullOrWhiteSpace(line))
             .Select(line => line.Trim().Split("\n").Select(ps => Packet.FromPacketString(ps.Trim()).Item1))
             .SelectMany(p => p)
-            .ToArray();
-        //packetPairStrings = sample
+            .ToList();
+        //packets = sample
         //    .Split("\r\n\r\n")
         //    .Where(line => !string.IsNullOrWhiteSpace(line))
         //    .Select(line => line.Trim().Split("\n").Select(ps => Packet.FromPacketString(ps.Trim()).Item1))
         //    .SelectMany(p => p)
-        //    .ToArray();
+        //    .ToList();
+        var dividerPackets = new Packet[]
+        {
+            new Packet(new Packet(new Packet(2))),
+            new Packet(new Packet(new Packet(6)))
+        };
         var indexesInRightOrder = new List<int>();
         var index = 0;
-        foreach (var packetPair in packetPairStrings.Chunk(2))
+        var comparer = new PacketComparer();
+        foreach (var packetPair in packets.Chunk(2))
         {
             index++;
-            if (ComparePair(packetPair))
+            if (comparer.Compare(packetPair.First(), packetPair.Last()) == -1)
                 indexesInRightOrder.Add(index);
         }
+        packets.AddRange(dividerPackets);
+        var sortedPackets = packets.OrderBy(p => p, comparer).ToList();
         Console.WriteLine($"AdventOfCode Day 13 Part 1 result: {indexesInRightOrder.Sum()}");
-        //Console.WriteLine($"AdventOfCode Day 13 Part 2 result:");
+        Console.WriteLine($"{string.Join("\n", sortedPackets)}");
+        var decoderKey = (sortedPackets.IndexOf(dividerPackets[0]) + 1) * (sortedPackets.IndexOf(dividerPackets[1]) + 1);
+        Console.WriteLine($"AdventOfCode Day 13 Part 2 result: {decoderKey}");
     }
+}
 
-    private static bool ComparePair(Packet[] packetPair)
+public class PacketComparer : IComparer<Packet>
+{
+    public int Compare(Packet left, Packet right)
     {
-        var leftPacket = packetPair.First();
-        var rightPacket = packetPair.Last();
-        var result = ComparePair(leftPacket, rightPacket);
+        if (left == right) return 0;
+        var result = ComparePair(left, right);
         Console.WriteLine(result);
-        return result.Value;
+        return result.Value ? -1 : 1;
     }
 
     private static bool? ComparePair(Packet left, Packet right, string indent = "")
@@ -141,6 +153,11 @@ public class Packet
     public void AddChild(Packet child)
     {
         Children.Add(child);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj.ToString() == this.ToString();
     }
 
     public override string ToString()
