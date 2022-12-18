@@ -27,36 +27,40 @@ internal class Day13
 [1,[2,[3,[4,[5,6,7]]]],8,9]
 [1,[2,[3,[4,[5,6,0]]]],8,9]
 ";
-        //var packetPairStrings = File.ReadAllText("AdventOfCode/Data/Day13Input.txt")
-        //    .Split("\n\n")
-        //    .Where(line => !string.IsNullOrWhiteSpace(line));
-        var packetPairStrings = sample
-            .Split("\r\n\r\n")
-            .Where(line => !string.IsNullOrWhiteSpace(line));
-        foreach (var packetPairString in packetPairStrings)
+        var packetPairStrings = File.ReadAllText("AdventOfCode/Data/Day13Input.txt")
+            .Split("\n\n")
+            .Where(line => !string.IsNullOrWhiteSpace(line))
+            .ToArray();
+        //var packetPairStrings = sample
+        //    .Split("\r\n\r\n")
+        //    .Where(line => !string.IsNullOrWhiteSpace(line))
+        //    .ToArray();
+        var indexesInRightOrder = new List<int>();
+        for (var index = 0; index < packetPairStrings.Length; index++)
         {
-            ComparePair(packetPairString.Trim());
+            if (ComparePair(packetPairStrings[index].Trim()))
+            {
+                indexesInRightOrder.Add(index + 1);
+            }
         }
-        //Console.WriteLine($"AdventOfCode Day 13 Part 1 result: {signalStrengthSum}");
+        Console.WriteLine($"AdventOfCode Day 13 Part 1 result: {indexesInRightOrder.Sum()}");
         //Console.WriteLine($"AdventOfCode Day 13 Part 2 result:");
     }
 
-    private static bool? ComparePair(string packetPairString)
+    private static bool ComparePair(string packetPairString)
     {
         var packets = packetPairString.Split("\n").Select(ps => Packet.FromPacketString(ps.Trim()).Item1).ToList();
         var leftPacket = packets.First();
         var rightPacket = packets.Last();
-        Packet currentLeftPacket = leftPacket;
-        Packet currentRightPacket = rightPacket;
+        Console.WriteLine(leftPacket);
+        Console.WriteLine(rightPacket);
         var result = ComparePair(leftPacket, rightPacket);
-        Console.WriteLine(result?.ToString() ?? "Oh no");
-        return result;
+        Console.WriteLine(result);
+        return result.Value;
     }
 
     private static bool? ComparePair(Packet left, Packet right)
     {
-        //var leftChildIndex = 0;
-        //var rightChildIndex = 0;
         var largestPacket = left.Children.Count < right.Children.Count ? right.Children.Count : left.Children.Count;
         for (var childIndex = 0; childIndex < largestPacket; childIndex++)
         {
@@ -68,6 +72,16 @@ internal class Day13
                 return false;
             var childLeft = left.Children[childIndex];
             var childRight = right.Children[childIndex];
+            if (childLeft.IsItem)
+            {
+                while (!childRight.IsItem && childRight.Children.Count > 0)
+                    childRight = childRight.Children.First();
+            }
+            else if (childRight.IsItem)
+            {
+                while (!childLeft.IsItem && childLeft.Children.Count > 0)
+                    childLeft = childLeft.Children.First();
+            }
             if (childLeft.IsItem && childRight.IsItem)
             {
                 if (childLeft.Item == null && childRight.Item == null)
@@ -93,25 +107,31 @@ internal class Day13
 public class Packet
 {
     public int? Item { get; set; } = null;
-    public bool IsItem { get { return Children.Count == 0; } }
+    public bool IsItem { get { return Item != null; } }
     public List<Packet> Children = new List<Packet>();
 
     public Packet() { }
 
-    public Packet(int item)
+    public Packet(int? item)
     {
         Item = item;
     }
 
-    public void AddItem(int item)
+    public void AddItem(int? item)
     {
-        // All values are wrapped in a child object so that everything ends up being a list with a single value in the end.
-        Children.Add(new Packet(item));
+        AddChild(new Packet(item));
     }
 
     public void AddChild(Packet child)
     {
         Children.Add(child);
+    }
+
+    public override string ToString()
+    {
+        if (IsItem)
+            return Item?.ToString() ?? string.Empty;
+        return $"[{string.Join(',', Children)}]";
     }
 
     public static Tuple<Packet, int> FromPacketString(string packetString)
@@ -130,25 +150,17 @@ public class Packet
                 numberBuilder = "";
             }
             if (currentChar == ']')
-            {
-                if (packet.IsItem && packet.Item == null)
-                    // Empty packet, still need child to wrap the empty value
-                    packet.AddChild(new Packet());
                 return Tuple.Create(packet, charIndex);
-            }
             if (currentChar == ',') continue;
             if (currentChar == '[')
             {
                 var child = Packet.FromPacketString(packetString.Substring(charIndex));
-                // All values are wrapped in a child object so that everything ends up being a list with a single value in the end.
                 packet.AddChild(child.Item1);
                 charIndex += child.Item2;
             }
             else
-            {
                 numberBuilder += currentChar;
-            }
         }
-        return null;
+        throw new Exception();
     }
 }
