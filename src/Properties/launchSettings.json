@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "AdventCalendar2022": {
+      "commandName": "Project"
+    },
+    "Windows Terminal Debug": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files\\WindowsApps\\Microsoft.WindowsTerminal_1.15.3465.0_x64__8wekyb3d8bbwe\\wt.exe",
+      "commandLineArgs": "dotnet.exe run -p D:\\Dokumenter\\dev\\Julekalender2022\\src\\AdventCalendar2022.csproj",
+      "workingDirectory": "D:\\Dokumenter\\dev\\Julekalender2022\\src"
+    }
+  }
+}
