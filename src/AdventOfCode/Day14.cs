@@ -26,7 +26,10 @@ internal class Day14
         var sandStartCoords = new Coordinate(500, 0);
         var maxX = Math.Max(sandStartCoords.X, paths.Select(path => path.Max(coordinate => coordinate.X)).Max());
         var maxY = paths.Select(path => path.Max(coordinate => coordinate.Y)).Max();
-        var matrix = new int[maxX + 1, maxY + 1];
+        var floorY = maxY + 2;
+        var matrix = new int[maxX * 2, floorY + 1];
+        for (var x = 0; x < matrix.GetLength(0); x++)
+            matrix[x, floorY] = 1;
         foreach (var path in paths)
         {
             for (var positionIndex = 0; positionIndex < path.Length - 1; positionIndex++)
@@ -49,12 +52,15 @@ internal class Day14
                 }
             }
         }
+        //PrintMatrix(matrix);
         var sand = new Coordinate(sandStartCoords.X, sandStartCoords.Y);
-        var sandAtRest = 0;
+        var sandAtRestPart1 = 0;
+        var part1Complete = false;
+        var sandAtRestPart2 = 0;
         while (true)
         {
-            if (sand.Y >= maxY)
-                break;
+            if (sand.Y > maxY)
+                part1Complete = true;
             if (matrix[sand.X, sand.Y + 1] == 0)
                 sand.Y++;
             else if (matrix[sand.X - 1, sand.Y + 1] == 0)
@@ -69,13 +75,17 @@ internal class Day14
             }
             else
             {
-                sandAtRest++;
+                if (!part1Complete)
+                    sandAtRestPart1++;
+                sandAtRestPart2++;
                 matrix[sand.X, sand.Y] = -1;
+                if (sand.X == sandStartCoords.X && sand.Y == sandStartCoords.Y)
+                    break;
                 sand = new Coordinate(sandStartCoords.X, sandStartCoords.Y);
             }
         }
-        Console.WriteLine($"AdventOfCode Day 14 Part 1 result: {sandAtRest}");
-        Console.WriteLine($"AdventOfCode Day 14 Part 2 result: ");
+        Console.WriteLine($"AdventOfCode Day 14 Part 1 result: {sandAtRestPart1}");
+        Console.WriteLine($"AdventOfCode Day 14 Part 2 result: {sandAtRestPart2}");
     }
 
     public static void PrintMatrix(int[,] matrix)
